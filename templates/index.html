@@ -3,56 +3,101 @@
 <head>
     <meta charset="utf-8">
     <title>Scraper de page web</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 40px; }
-        form { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="text"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-            margin-bottom: 10px;
-        }
-        button {
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        .erreur {
-            color: #b00020;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        textarea {
-            width: 100%;
-            height: 400px;
-            box-sizing: border-box;
-            white-space: pre-wrap;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
 </head>
 <body>
-    <h1>Mini app de scraping</h1>
-    <p>Indique l'URL de la page que tu veux scraper (n'importe quel site web).</p>
+    <div class="page-wrapper">
+        <div class="card">
+            <h1>Mini app de scraping 🕸️</h1>
+            <p class="subtitle">
+                Indique l’URL de la page que tu veux scraper (article, blog, page Wikipédia, etc.).
+            </p>
 
-    <form method="POST">
-        <label for="url">URL de la page :</label>
-        <input
-            type="text"
-            id="url"
-            name="url"
-            value="{{ url_saisie }}"
-            placeholder="https://example.com"
-        >
-        <button type="submit">Scraper</button>
-    </form>
+            <form method="POST">
+                <label for="url">URL de la page :</label>
+                <div class="url-group">
+                    <input
+                        type="text"
+                        id="url"
+                        name="url"
+                        value="{{ url_saisie }}"
+                        placeholder="https://example.com/article"
+                        autocomplete="off"
+                    >
+                    <button type="submit" class="btn-primary">
+                        <span class="icon">🔍</span>
+                        <span>Scraper</span>
+                    </button>
+                </div>
+            </form>
 
-    {% if erreur %}
-        <div class="erreur">{{ erreur }}</div>
-    {% endif %}
+            {% if erreur %}
+                <div class="erreur">{{ erreur }}</div>
+            {% endif %}
 
-    {% if texte %}
-        <h2>Texte scrapé</h2>
-        <textarea readonly>{{ texte }}</textarea>
-    {% endif %}
+            {% if texte %}
+                <div class="result-section">
+                    <div class="result-header">
+                        <h2>Texte scrapé</h2>
+                        <div>
+                            <button type="button" class="btn-ghost" onclick="copierTexte()">
+                                <span class="icon">📋</span>
+                                <span>Copier tout le texte</span>
+                            </button>
+                            <div id="copie-ok" class="notice">
+                                ✅ Texte copié dans le presse-papiers
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="resultat" readonly>{{ texte }}</textarea>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function copierTexte() {
+            const textarea = document.getElementById("resultat");
+            const notice = document.getElementById("copie-ok");
+            if (!textarea) return;
+
+            const contenu = textarea.value;
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(contenu).then(function () {
+                    if (notice) {
+                        notice.style.display = "block";
+                        setTimeout(() => {
+                            notice.style.display = "none";
+                        }, 2000);
+                    }
+                }).catch(function () {
+                    // Fallback si le copier moderne échoue
+                    fallbackCopy(textarea, notice);
+                });
+            } else {
+                // Fallback pour vieux navigateurs
+                fallbackCopy(textarea, notice);
+            }
+        }
+
+        function fallbackCopy(textarea, notice) {
+            textarea.focus();
+            textarea.select();
+            try {
+                document.execCommand("copy");
+                if (notice) {
+                    notice.style.display = "block";
+                    setTimeout(() => {
+                        notice.style.display = "none";
+                    }, 2000);
+                }
+            } catch (err) {
+                alert("Impossible de copier automatiquement. Copie manuelle : Ctrl+C / Cmd+C.");
+            }
+            window.getSelection().removeAllRanges();
+        }
+    </script>
 </body>
 </html>
