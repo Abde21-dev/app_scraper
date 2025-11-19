@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <title>Scraper de page web</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        form { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .erreur {
+            color: #b00020;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            height: 400px;
+            box-sizing: border-box;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mini app de scraping</h1>
+    <p>Indique l'URL de la page que tu veux scraper (n'importe quel site web).</p>
+
+    <form method="POST">
+        <label for="url">URL de la page :</label>
+        <input
+            type="text"
+            id="url"
+            name="url"
+            value="{{ url_saisie }}"
+            placeholder="https://example.com"
+        >
+        <button type="submit">Scraper</button>
+    </form>
+
+    {% if erreur %}
+        <div class="erreur">{{ erreur }}</div>
+    {% endif %}
+
+    {% if texte %}
+        <h2>Texte scrapé</h2>
+        <textarea readonly>{{ texte }}</textarea>
+    {% endif %}
+</body>
+</html>
